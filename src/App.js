@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import AutoSuggest from "./components/AutoSuggest";
 
-function App() {
+const App = () => {//TODO test
+  const suggestionProvider = async value => {
+    const apiHeaders = new Headers();
+    apiHeaders.append("apikey", "43P9bg9AOKo4CVg1uQtdYHsiCj3jbQeF");
+    const requestOptions = {
+      method: 'GET',
+      redirect: 'follow',
+      headers: apiHeaders
+    };
+
+    const response = await fetch(`https://api.apilayer.com/google_search?q=${value}`, requestOptions);
+    const data = await response.json();
+    const titles = data.organic.map(item => item.title);
+
+    return titles;
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AutoSuggest suggestionProvider={suggestionProvider} />
   );
-}
+};
 
 export default App;
