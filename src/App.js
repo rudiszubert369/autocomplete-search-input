@@ -10,7 +10,6 @@ const App = () => {//TODO test
       redirect: 'follow',
       headers: apiHeaders
     };
-
     const response = await fetch(`https://api.apilayer.com/google_search?q=${value}`, requestOptions);
     const results = await response.json();
     const titles = results.organic.map(result => result.title);
