@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useRefCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLightbulb, faHourglass } from '@fortawesome/free-regular-svg-icons';
@@ -7,7 +7,6 @@ import styles from './AutoSuggest.module.scss'
 const AutoSuggest = ({ suggestionProvider, onSuggestionSelected }) => {
   const [value, setValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const debounceTimeout = useRef(null);
@@ -16,7 +15,6 @@ const AutoSuggest = ({ suggestionProvider, onSuggestionSelected }) => {
 
   const handleClickOutside = event => {
     if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
-      setShowSuggestions(false);
       setSuggestions([]);
     }
   };
@@ -26,14 +24,12 @@ const AutoSuggest = ({ suggestionProvider, onSuggestionSelected }) => {
       clearTimeout(debounceTimeout.current);
     }
 
-    if (value.length >= 3 && !suggestions.length) {
+    if (value.length >= 3 && !suggestions.length) {//fetch only when suggestions are empty
       debounceTimeout.current = setTimeout(() => {
         setIsFetching(true);
-
         suggestionProvider(value).then(suggestions => {
           const slicedSuggestions = suggestions.slice(0, maxSuggestions);
           setSuggestions(slicedSuggestions);
-          setShowSuggestions(true);
           setIsFetching(false);
           document.addEventListener("click", handleClickOutside);
 
@@ -47,19 +43,17 @@ const AutoSuggest = ({ suggestionProvider, onSuggestionSelected }) => {
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-    
   }, [value, suggestionProvider]);
 
   const handleInputChange = event => {
     setValue(event.target.value);
-    setSuggestions([]);
-    setShowSuggestions(false);
+    setSuggestions([]);//hide suggestions when user is typing
   };
 
   const handleSuggestionClick = suggestion => {
     setValue(suggestion);
-    setShowSuggestions(false);
-    onSuggestionSelected(suggestion)
+    onSuggestionSelected(suggestion); //I was not sure what this should do so I just added it blindly as it was in task
+    setSuggestions([]);
   };
 
   const handleKeyDown = event => {
@@ -119,7 +113,7 @@ const AutoSuggest = ({ suggestionProvider, onSuggestionSelected }) => {
         onKeyDown={handleKeyDown}
         aria-label="Search input with auto-suggestions"
       />
-      <ul ref={suggestionsRef} className={`${styles.list} ${showSuggestions ? styles.show : ''}`}>
+      <ul ref={suggestionsRef} className={`${styles.list} ${suggestions.length > 0 ? styles.show : ''}`}>
         {suggestionList}
       </ul>
     </div>

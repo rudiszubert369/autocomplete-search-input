@@ -3,15 +3,23 @@ import AutoSuggest from "./components/AutoSuggest";
 
 const App = () => {
   const fetchSuggestions = async value => {
-    const apiKey = "43P9bg9AOKo4CVg1uQtdYHsiCj3jbQeF";
-    const url = `https://api.apilayer.com/google_search?q=${value}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { "apikey": apiKey }
-    });
-    const results = await response.json();
-
-    return results.organic.map(result => result.title);
+    try {
+      const apiKey = "43P9bg9AOKo4CVg1uQtdYHsiCj3jbQeF";
+      const url = `https://api.apilayer.com/google_search?q=${value}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { "apikey": apiKey }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch suggestions: ${response.statusText}`);
+      }
+      const results = await response.json();
+  
+      return results.organic.map(result => result.title);
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   };
 
   const handleSuggestionSelection = suggestion => {

@@ -21,7 +21,6 @@ module.exports = {
         "react"
     ],
     "rules": {
-        'react/jsx-no-undef': 'error',
         // JSX rules
         'react/jsx-indent': ['error', 2],
         'react/jsx-no-duplicate-props': 'error',
